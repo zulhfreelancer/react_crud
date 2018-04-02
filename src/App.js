@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import ProductItem from './ProductItem';
 import './App.css';
 
 var products = [
@@ -20,17 +20,29 @@ class App extends Component {
     super(props);
 
     this.state = {
-      products: []
+      products: JSON.parse( localStorage.getItem("products") )
     };
+
+    this.onDelete = this.onDelete.bind(this);
   }
 
   componentWillMount() {
-    this.getProducts();
+    var products = this.getProducts();
+    this.setState({ products });
   }
 
   getProducts() {
-    var products = JSON.parse( localStorage.getItem("products") );
-    this.setState({ products });
+    return this.state.products;
+  }
+
+  onDelete(name) {
+    console.log(name);
+    var products = this.getProducts();
+    var filteredProducts = products.filter(product => {
+      return product.name !== name;
+    });
+    console.log(filteredProducts);
+    this.setState({products: filteredProducts});
   }
 
   render() {
@@ -41,9 +53,11 @@ class App extends Component {
         {
           this.state.products.map(product => {
             return (
-              <div key={product.name}>
-                <span>{product.name}</span> <span>{product.price}</span>
-              </div>
+              <ProductItem
+                key   = {product.name}
+                {...product}
+                onDelete = {this.onDelete}
+              />
             )
           })
         }
